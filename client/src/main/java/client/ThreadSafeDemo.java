@@ -8,11 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadSafeDemo {
 
-    //Thread safe
-    //Tråd säker
-
-//    private static int anInt = 0;
-private static AtomicInteger anInt = new AtomicInteger();
+    private static AtomicInteger anInt = new AtomicInteger();
 
     public static void main(String[] args) {
 
