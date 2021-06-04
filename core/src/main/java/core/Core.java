@@ -10,25 +10,37 @@ public class Core {
 
     public static void main(String[] args) {
 
-            try (ServerSocket serverSocket = new ServerSocket(5050)) {
-        while (true) {
+        try (ServerSocket serverSocket = new ServerSocket(5050)) {
 
-                Socket acceptClient = serverSocket.accept();
+            while (true) {
+                Socket client = serverSocket.accept();
+                System.out.println("ClientIpAddress: " + client.getInetAddress());
 
-                System.out.println("ClientIpAddress: " + acceptClient.getInetAddress());
+                var inputFromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                while (true) {
+                    String line = inputFromClient.readLine();
+                    if (line == null||line.isEmpty()) {
+                        break;
+                    }
+                    System.out.println(line);
 
-                BufferedReader inputFromClient = new BufferedReader(new InputStreamReader(acceptClient.getInputStream()));
+                }
+                PrintWriter outPutToClient = new PrintWriter(client.getOutputStream());
+                outPutToClient.print("HTTP/1.1 404 Not Found\r\nContent-length: 0\r\n\r\n");
+
 
 //                System.out.println(inputFromClient.readLine());
-                inputFromClient.lines().forEach(System.out::println);
+//                inputFromClient.lines().forEach(System.out::println);
 
+                outPutToClient.flush();
+                outPutToClient.close();
                 inputFromClient.close();
-                acceptClient.close();
+                client.close();
             }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }
