@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +16,7 @@ public class Core {
     //Skriv en server som sparar inkommande information
     //och sen returenerar all sparad information som svar
 
+//    public static List<String> billbord = Collections.synchronizedList(new ArrayList<>());
     public static List<String> billbord = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -60,18 +62,33 @@ public class Core {
             System.out.println(Thread.currentThread().getName());
 
             var inputFromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            List<String> tempList = new ArrayList<>();
             while (true) {
                 String line = inputFromClient.readLine();
                 if (line == null || line.isEmpty()) {
                     break;
                 }
+                //annat sett att synchonicera
+
+//                synchronized (billbord){
+//                    billbord.add(line);
+//                }
+
                 billbord.add(line);
                 System.out.println(line);
 
             }
+
+            synchronized (billbord){
+                billbord.addAll(tempList);
+            }
+
             PrintWriter outPutToClient = new PrintWriter(client.getOutputStream());
-            for (String line: billbord) {
-                outPutToClient.print(line+"\r\n");
+
+            synchronized (billbord) {
+                for (String line : billbord) {
+                    outPutToClient.print(line + "\r\n");
+                }
             }
             outPutToClient.print("\r\n");
 //            outPutToClient.print("HTTP/1.1 404 Not Found\r\nContent-length: 0\r\n\r\n");
